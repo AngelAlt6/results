@@ -120,6 +120,7 @@ def send_clan_results():
         return
 
     content = ""
+    count = 0
     for game in reversed(new_games):  # Post in reverse order
         game_info = (
             f"```\n"
@@ -133,10 +134,19 @@ def send_clan_results():
             f"```\n"
         )
         content += game_info
+        count += 1
 
-    messages = split_message(content)
-    for message in messages:
-        send_discord_message(message)
+        if count == 6:
+            messages = split_message(content)
+            for message in messages:
+                send_discord_message(message)
+            content = ""
+            count = 0
+
+    if content:
+        messages = split_message(content)
+        for message in messages:
+            send_discord_message(message)
 
     save_data(existing_data + new_games)
 
