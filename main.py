@@ -1,9 +1,9 @@
 import requests
-from bs4 import BeautifulSoup
 import os
 import logging
 import json
 from datetime import datetime, timedelta
+from time import sleep
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -12,17 +12,26 @@ logging.basicConfig(level=logging.INFO)
 WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
 DATA_FILE = 'clan_results.json'
 
+# Check if the webhook URL is set
+if not WEBHOOK_URL:
+    logging.error("DISCORD_WEBHOOK_URL environment variable is not set.")
+    exit(1)
+
 # Load existing data
 def load_data():
     if os.path.exists(DATA_FILE):
-        with open(DATA_FILE, 'r') as file:
-            return json.load(file)
+        try:
+            with open(DATA_FILE, 'r') as file:
+                return json.load(file)
+        except json.JSONDecodeError:
+            logging.error("JSONDecodeError: The data file is empty or corrupted. Initializing with an empty list.")
+            return []
     return []
 
 # Save data to JSON file
 def save_data(data):
     with open(DATA_FILE, 'w') as file:
-        json.dump(data, file)
+        json.dump(data, file, indent=4)
 
 # Delete data file if older than 24 hours
 def delete_old_data():
@@ -34,11 +43,17 @@ def delete_old_data():
 # Scrape the results from the website
 def scrape_clan_results():
     url = 'https://territorial.io/clan-results'
-    try:
-        response = requests.get(url)
-        response.raise_for_status()
-    except requests.exceptions.RequestException as e:
-        logging.error(f"Failed to retrieve data: {e}")
+    retries = 3
+    for _ in range(retries):
+        try:
+            response = requests.get(url)
+            response.raise_for_status()
+            break
+        except requests.exceptions.RequestException as e:
+            logging.error(f"Failed to retrieve data: {e}")
+            sleep(5)
+    else:
+        logging.error("Max retries exceeded. Exiting.")
         return None
 
     text = response.text
@@ -109,14 +124,15 @@ def send_clan_results():
     content = ""
     for game in reversed(new_games):  # Post in reverse order
         game_info = (
-            f"**Time:** {game['Time']}\n"
-            f"**Game Mode:** {game['Game Mode']}\n"
-            f"**Map:** {game['Map']}\n"
-            f"**Player Count:** {game['Player Count']}\n"
-            f"**Team T:** {game['Team T']}\n"
-            f"**Percentage L:** {game['Percentage L']}\n"
-            f"**Res:**\n" + "\n".join(game['Res']) + "\n"
-            "\n"
+            f"```\n"
+            f"Time: {game['Time']}\n"
+            f"Game Mode: {game['Game Mode']}\n"
+            f"Map: {game['Map']}\n"
+            f"Player Count: {game['Player Count']}\n"
+            f"Team T: {game['Team T']}\n"
+            f"Percentage L: {game['Percentage L']}\n"
+            f"Res:\n" + "\n".join(game['Res']) + "\n"
+            f"```\n"
         )
         content += game_info
 
@@ -128,4 +144,8 @@ def send_clan_results():
 
 # Run the function
 if __name__ == '__main__':
-    send_clan_results()
+    try:
+        send_clan_results()
+    except Exception as e:
+        logging.error(f"An error occurred: {e}")
+        send_discord_message(f"An error occurred while running the scraper: {e}")
