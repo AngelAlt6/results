@@ -33,12 +33,10 @@ def save_data(data):
     with open(DATA_FILE, 'w') as file:
         json.dump(data, file, indent=4)
 
-# Delete data file if older than 24 hours
-def delete_old_data():
-    if os.path.exists(DATA_FILE):
-        file_time = datetime.fromtimestamp(os.path.getmtime(DATA_FILE))
-        if datetime.now() - file_time > timedelta(hours=24):
-            os.remove(DATA_FILE)
+# Remove data older than 24 hours
+def remove_old_data(data):
+    cutoff_time = datetime.now() - timedelta(hours=24)
+    return [game for game in data if datetime.strptime(game['Time'], '%a, %d %b %Y %H:%M:%S %Z') > cutoff_time]
 
 # Scrape the results from the website
 def scrape_clan_results():
@@ -109,8 +107,8 @@ def split_message(content, limit=2000):
 
 # Format and send the scraped data to Discord
 def send_clan_results():
-    delete_old_data()
     existing_data = load_data()
+    existing_data = remove_old_data(existing_data)
     games = scrape_clan_results()
     if not games:
         logging.info("No game results to send.")
