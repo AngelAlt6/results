@@ -1,6 +1,10 @@
 import requests
 from bs4 import BeautifulSoup
 import os
+import logging
+
+# Set up logging
+logging.basicConfig(level=logging.INFO)
 
 # Discord Webhook URL from environment variable
 WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
@@ -8,10 +12,11 @@ WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
 # Scrape the results from the website
 def scrape_clan_results():
     url = 'https://territorial.io/clan-results'
-    response = requests.get(url)
-
-    if response.status_code != 200:
-        print(f"Failed to retrieve data: {response.status_code}")
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        logging.error(f"Failed to retrieve data: {e}")
         return None
 
     soup = BeautifulSoup(response.content, 'html.parser')
@@ -43,15 +48,17 @@ def scrape_clan_results():
 # Function to send the message to Discord
 def send_discord_message(content):
     data = {"content": content}
-    response = requests.post(WEBHOOK_URL, json=data)
-    if response.status_code != 204:
-        print(f"Failed to send message: {response.status_code}")
+    try:
+        response = requests.post(WEBHOOK_URL, json=data)
+        response.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        logging.error(f"Failed to send message: {e}")
 
 # Format and send the scraped data to Discord
 def send_clan_results():
     games = scrape_clan_results()
     if not games:
-        print("No game results to send.")
+        logging.info("No game results to send.")
         return
 
     for game in games:
