@@ -1,5 +1,4 @@
 import requests
-from bs4 import BeautifulSoup
 import os
 import logging
 
@@ -19,30 +18,32 @@ def scrape_clan_results():
         logging.error(f"Failed to retrieve data: {e}")
         return None
 
-    soup = BeautifulSoup(response.content, 'html.parser')
+    text = response.text
     games = []
+    game_data = {}
 
-    # Find all the relevant data blocks (update with correct tags or classes)
-    result_blocks = soup.find_all('div', class_='result-block')  # Adjusted selector
+    for line in text.splitlines():
+        if line.startswith("Time:"):
+            if game_data:
+                games.append(game_data)
+                game_data = {}
+            game_data['Time'] = line.split("Time:")[1].strip()
+        elif line.startswith("Game Mode:"):
+            game_data['Game Mode'] = line.split("Game Mode:")[1].strip()
+        elif line.startswith("Map:"):
+            game_data['Map'] = line.split("Map:")[1].strip()
+        elif line.startswith("Player Count:"):
+            game_data['Player Count'] = line.split("Player Count:")[1].strip()
+        elif line.startswith("Team T:"):
+            game_data['Team T'] = line.split("Team T:")[1].strip()
+        elif line.startswith("Percentage L:"):
+            game_data['Percentage L'] = line.split("Percentage L:")[1].strip()
+        elif line.startswith("Res:"):
+            game_data['Res'] = []
+        elif line.startswith("   ["):
+            game_data['Res'].append(line.strip())
 
-    for block in result_blocks:
-        game_data = {}
-
-        # Extract data from the HTML block
-        time = block.find('span', class_='time').text.strip()
-        mode = block.find('span', class_='mode').text.strip()
-        map_name = block.find('span', class_='map').text.strip()
-        player_count = block.find('span', class_='player-count').text.strip()
-        winner = block.find('span', class_='winner').text.strip()  # Example additional field
-
-        # Add extracted data to game_data dict
-        game_data['Time'] = time
-        game_data['Game Mode'] = mode
-        game_data['Map'] = map_name
-        game_data['Player Count'] = player_count
-        game_data['Winner'] = winner  # Example additional field
-
-        # Add any other necessary fields
+    if game_data:
         games.append(game_data)
 
     return games
@@ -82,7 +83,9 @@ def send_clan_results():
             f"**Game Mode:** {game['Game Mode']}\n"
             f"**Map:** {game['Map']}\n"
             f"**Player Count:** {game['Player Count']}\n"
-            f"**Winner:** {game['Winner']}\n"  # Example additional field
+            f"**Team T:** {game['Team T']}\n"
+            f"**Percentage L:** {game['Percentage L']}\n"
+            f"**Res:**\n" + "\n".join(game['Res']) + "\n"
             "\n"
         )
         content += game_info
