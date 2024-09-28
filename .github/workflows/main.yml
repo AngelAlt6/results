@@ -3,6 +3,7 @@ name: Scrape Territorial.io Results
 on:
   schedule:
     - cron: '*/5 * * * *'  # Run every 5 minutes
+  workflow_dispatch:  # Allows manual triggering
 
 jobs:
   scrape_and_post:
