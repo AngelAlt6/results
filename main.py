@@ -1,12 +1,35 @@
 import requests
+from bs4 import BeautifulSoup
 import os
 import logging
+import json
+from datetime import datetime, timedelta
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 
 # Discord Webhook URL from environment variable
 WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
+DATA_FILE = 'clan_results.json'
+
+# Load existing data
+def load_data():
+    if os.path.exists(DATA_FILE):
+        with open(DATA_FILE, 'r') as file:
+            return json.load(file)
+    return []
+
+# Save data to JSON file
+def save_data(data):
+    with open(DATA_FILE, 'w') as file:
+        json.dump(data, file)
+
+# Delete data file if older than 24 hours
+def delete_old_data():
+    if os.path.exists(DATA_FILE):
+        file_time = datetime.fromtimestamp(os.path.getmtime(DATA_FILE))
+        if datetime.now() - file_time > timedelta(hours=24):
+            os.remove(DATA_FILE)
 
 # Scrape the results from the website
 def scrape_clan_results():
@@ -71,13 +94,20 @@ def split_message(content, limit=2000):
 
 # Format and send the scraped data to Discord
 def send_clan_results():
+    delete_old_data()
+    existing_data = load_data()
     games = scrape_clan_results()
     if not games:
         logging.info("No game results to send.")
         return
 
+    new_games = [game for game in games if game not in existing_data]
+    if not new_games:
+        logging.info("No new game results to send.")
+        return
+
     content = ""
-    for game in games:
+    for game in reversed(new_games):  # Post in reverse order
         game_info = (
             f"**Time:** {game['Time']}\n"
             f"**Game Mode:** {game['Game Mode']}\n"
@@ -93,6 +123,8 @@ def send_clan_results():
     messages = split_message(content)
     for message in messages:
         send_discord_message(message)
+
+    save_data(existing_data + new_games)
 
 # Run the function
 if __name__ == '__main__':
