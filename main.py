@@ -23,16 +23,16 @@ def scrape_clan_results():
     games = []
 
     # Find all the relevant data blocks (update with correct tags or classes)
-    result_blocks = soup.find_all('div', class_='game-result')  # Example selector, adjust as needed
+    result_blocks = soup.find_all('div', class_='result-block')  # Adjusted selector
 
     for block in result_blocks:
         game_data = {}
 
         # Extract data from the HTML block
-        time = block.find('span', class_='time').text
-        mode = block.find('span', class_='mode').text
-        map_name = block.find('span', class_='map').text
-        player_count = block.find('span', class_='player-count').text
+        time = block.find('span', class_='time').text.strip()
+        mode = block.find('span', class_='mode').text.strip()
+        map_name = block.find('span', class_='map').text.strip()
+        player_count = block.find('span', class_='player-count').text.strip()
 
         # Add extracted data to game_data dict
         game_data['Time'] = time
