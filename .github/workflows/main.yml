@@ -42,6 +42,6 @@ jobs:
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add clan_results.json
           git commit -m 'Update clan results data'
-          git push https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/AngelAlt6/results.git
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/AngelAlt6/results.git
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
