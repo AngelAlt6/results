@@ -150,5 +150,9 @@ def send_clan_results():
 
     save_data(existing_data + new_games)
 
-# Run the function
 if __name__ == '__main__':
+    try:
+        send_clan_results()
+    except Exception as e:
+        logging.error(f"An error occurred: {e}")
+        send_discord_message(f"An error occurred while running the scraper: {e}")
