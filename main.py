@@ -8,13 +8,16 @@ from time import sleep
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 
-# Discord Webhook URL from environment variable
+# Discord Webhook URLs from environment variables
 WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
-DATA_FILE = 'clan_results.json'
+DAILY_WINNER_WEBHOOK_URL = os.getenv('DAILY_WINNER_WEBHOOK_URL')  # For sending daily clan winner
 
-# Check if the webhook URL is set
-if not WEBHOOK_URL:
-    logging.error("DISCORD_WEBHOOK_URL environment variable is not set.")
+DATA_FILE = 'clan_results.json'
+LAST_WINNER_FILE = 'last_winner_time.json'  # Track when the last winner was sent
+
+# Check if the webhook URLs are set
+if not WEBHOOK_URL or not DAILY_WINNER_WEBHOOK_URL:
+    logging.error("DISCORD_WEBHOOK_URL or DAILY_WINNER_WEBHOOK_URL environment variables are not set.")
     exit(1)
 
 # Load existing data
@@ -32,6 +35,21 @@ def load_data():
 def save_data(data):
     with open(DATA_FILE, 'w') as file:
         json.dump(data, file, indent=4)
+
+# Load the last winner timestamp
+def load_last_winner_time():
+    if os.path.exists(LAST_WINNER_FILE):
+        try:
+            with open(LAST_WINNER_FILE, 'r') as file:
+                return json.load(file).get('last_winner_time', '')
+        except json.JSONDecodeError:
+            logging.error("JSONDecodeError: The last winner file is empty or corrupted.")
+    return ''
+
+# Save the last winner timestamp
+def save_last_winner_time():
+    with open(LAST_WINNER_FILE, 'w') as file:
+        json.dump({'last_winner_time': datetime.now().isoformat()}, file, indent=4)
 
 # Remove data older than 24 hours
 def remove_old_data(data):
@@ -84,11 +102,11 @@ def scrape_clan_results():
 
     return games
 
-# Function to send the message to Discord
-def send_discord_message(content):
+# Function to send a message to Discord
+def send_discord_message(content, webhook_url):
     data = {"content": content}
     try:
-        response = requests.post(WEBHOOK_URL, json=data)
+        response = requests.post(webhook_url, json=data)
         response.raise_for_status()
     except requests.exceptions.RequestException as e:
         logging.error(f"Failed to send message: {e}")
@@ -139,21 +157,65 @@ def send_clan_results():
         if count == 6:
             messages = split_message(content)
             for message in messages:
-                send_discord_message(message)
+                send_discord_message(message, WEBHOOK_URL)
             content = ""
             count = 0
 
     if content:
         messages = split_message(content)
         for message in messages:
-            send_discord_message(message)
+            send_discord_message(message, WEBHOOK_URL)
 
     save_data(existing_data + new_games)
 
-# Run the function
+# Find the clan with the most wins in the past 24 hours
+def send_daily_clan_winner():
+    data = load_data()
+    data = remove_old_data(data)
+
+    if not data:
+        logging.info("No data available for calculating clan wins.")
+        return
+
+    clan_wins = {}
+    for game in data:
+        team_t = game.get('Team T')
+        if team_t:
+            clan_wins[team_t] = clan_wins.get(team_t, 0) + 1
+
+    if not clan_wins:
+        logging.info("No clans have won any games.")
+        return
+
+    # Find the clan with the most wins
+    top_clan = max(clan_wins, key=clan_wins.get)
+    top_wins = clan_wins[top_clan]
+
+    content = f"Clan with the most wins in the past 24 hours:\nClan: {top_clan}\nWins: {top_wins}"
+    send_discord_message(content, DAILY_WINNER_WEBHOOK_URL)
+
+# Main loop to check and send data continuously
+def main_loop():
+    last_winner_time = load_last_winner_time()
+    last_winner_time = datetime.fromisoformat(last_winner_time) if last_winner_time else datetime.now() - timedelta(hours=24)
+
+    while True:
+        # Send clan results
+        send_clan_results()
+
+        # Send the daily clan winner if 24 hours have passed
+        if datetime.now() - last_winner_time >= timedelta(hours=24):
+            send_daily_clan_winner()
+            save_last_winner_time()  # Update the last winner time
+            last_winner_time = datetime.now()
+
+        # Wait before checking again (e.g., 5 minutes)
+        sleep(300)
+
+# Run the loop
 if __name__ == '__main__':
     try:
-        send_clan_results()
+        main_loop()
     except Exception as e:
         logging.error(f"An error occurred: {e}")
-        send_discord_message(f"An error occurred while running the scraper: {e}")
+        send_discord_message(f"An error occurred while running the scraper: {e}", WEBHOOK_URL)
