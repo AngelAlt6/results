@@ -163,4 +163,4 @@ if __name__ == '__main__':
             logging.error(f"An error occurred: {e}")
             send_discord_message(f"An error occurred while running the scraper: {e}")
         # Set a sleep interval to control how often the script runs
-        sleep(10)  # Sleep for 300 seconds (5 minutes)
+        sleep(60)  # Sleep for 300 seconds (5 minutes)
