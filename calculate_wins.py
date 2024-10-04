@@ -29,7 +29,6 @@ def load_data():
 
 # Sanitize result strings by removing unexpected characters
 def sanitize_result(result):
-    # Remove non-printable characters and control characters
     return ''.join(c for c in result if c.isprintable() and c not in ('\n', '\r'))
 
 # Calculate wins in the last 24 hours
@@ -78,7 +77,7 @@ def send_discord_message(content):
     except requests.exceptions.RequestException as e:
         logging.error(f"Failed to send message: {e}")
 
-# Format and send the win results
+# Format and send the top clans' win results
 def report_wins():
     data = load_data()
     win_counts = calculate_wins(data)
@@ -87,11 +86,11 @@ def report_wins():
         logging.info("No wins found in the last 24 hours.")
         return
 
-    # Sort clans by win counts
-    sorted_wins = sorted(win_counts.items(), key=lambda item: item[1], reverse=True)
+    # Sort clans by win counts and limit to top 30
+    sorted_wins = sorted(win_counts.items(), key=lambda item: item[1], reverse=True)[:30]
 
     # Create message content
-    content = "Clan Wins in the Last 24 Hours:\n"
+    content = "Top 30 Clans with Most Wins in the Last 24 Hours:\n"
     for clan, wins in sorted_wins:
         content += f"{clan}: {wins} wins\n"
 
