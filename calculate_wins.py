@@ -29,8 +29,8 @@ def load_data():
 
 # Sanitize result strings by removing unexpected characters
 def sanitize_result(result):
-    # Replace unwanted characters (you can customize this based on what you find in your results)
-    return ''.join(char for char in result if char.isprintable())
+    # Remove non-printable characters and control characters
+    return ''.join(c for c in result if c.isprintable() and c not in ('\n', '\r'))
 
 # Calculate wins in the last 24 hours
 def calculate_wins(data):
@@ -50,22 +50,22 @@ def calculate_wins(data):
                 if len(parts) < 2:
                     logging.warning(f"Unexpected format in result: {result}")
                     continue
-
-                clan_name = result.split(':')[0].strip('[] ')
-                percentage_str = parts[1].split(',')[0].strip()
-
+                
                 try:
+                    clan_name = result.split(':')[0].strip('[] ')
+                    percentage_str = parts[1].split(',')[0].strip()
                     percentage = float(percentage_str)
-                except ValueError:
-                    logging.warning(f"Could not convert percentage to float: {percentage_str}")
+
+                    if clan_name not in win_counts:
+                        win_counts[clan_name] = 0
+
+                    # Check for win
+                    if percentage > 50:  # Modify based on your winning criteria
+                        win_counts[clan_name] += 1
+                
+                except ValueError as e:
+                    logging.warning(f"Could not process result: {result}, error: {e}")
                     continue
-
-                if clan_name not in win_counts:
-                    win_counts[clan_name] = 0
-
-                # Check for win (assuming that a win is determined by the highest percentage)
-                if percentage > 50:  # Modify this condition based on your winning criteria
-                    win_counts[clan_name] += 1
 
     return win_counts
 
