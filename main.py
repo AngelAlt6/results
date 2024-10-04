@@ -8,21 +8,14 @@ from time import sleep
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 
-# Webhook URLs for general game results
-WEBHOOK_URLS = os.getenv('DISCORD_WEBHOOK_URLS', '').split(',')
-
-# Webhook URLs for top winner messages
-WINNER_WEBHOOK_URLS = os.getenv('DISCORD_WINNER_WEBHOOK_URLS', '').split(',')
-
-if not WEBHOOK_URLS or WEBHOOK_URLS == ['']:
-    logging.error("DISCORD_WEBHOOK_URLS environment variable is not set.")
-    exit(1)
-
-if not WINNER_WEBHOOK_URLS or WINNER_WEBHOOK_URLS == ['']:
-    logging.warning("DISCORD_WINNER_WEBHOOK_URLS is not set. No winner messages will be sent.")
-
+# Discord Webhook URL from environment variable
+WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
 DATA_FILE = 'clan_results.json'
-win_counter = {}
+
+# Check if the webhook URL is set
+if not WEBHOOK_URL:
+    logging.error("DISCORD_WEBHOOK_URL environment variable is not set.")
+    exit(1)
 
 # Load existing data
 def load_data():
@@ -91,17 +84,14 @@ def scrape_clan_results():
 
     return games
 
-# Function to send the message to multiple Discord webhooks with a delay
-def send_discord_message(content, webhooks):
+# Function to send the message to Discord
+def send_discord_message(content):
     data = {"content": content}
-    
-    for webhook_url in webhooks:
-        try:
-            response = requests.post(webhook_url, json=data)
-            response.raise_for_status()
-            sleep(5)  # Adding 5 seconds delay between each message to avoid rate-limiting
-        except requests.exceptions.RequestException as e:
-            logging.error(f"Failed to send message to {webhook_url}: {e}")
+    try:
+        response = requests.post(WEBHOOK_URL, json=data)
+        response.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        logging.error(f"Failed to send message: {e}")
 
 # Split the message into smaller parts if it exceeds Discord's limit
 def split_message(content, limit=2000):
@@ -114,23 +104,6 @@ def split_message(content, limit=2000):
         content = content[split_index:]
     parts.append(content)
     return parts
-
-# Update win counter for players
-def update_win_counter(games):
-    global win_counter
-    for game in games:
-        for result in game['Res']:
-            # Assuming the format of result is something like '[Rank] PlayerName (Points)'
-            player_name = result.split()[1]  # Adjust based on actual format of result
-            win_counter[player_name] = win_counter.get(player_name, 0) + 1
-
-# Send the player with most wins in the past 24 hours to Discord
-def send_top_winner():
-    if not win_counter:
-        return
-    top_winner = max(win_counter, key=win_counter.get)
-    content = f"Player with most wins in the past 24 hours: {top_winner} with {win_counter[top_winner]} wins!"
-    send_discord_message(content, WINNER_WEBHOOK_URLS)
 
 # Format and send the scraped data to Discord
 def send_clan_results():
@@ -146,13 +119,12 @@ def send_clan_results():
         logging.info("No new game results to send.")
         return
 
-    update_win_counter(new_games)  # Update win counter based on new games
-
     content = ""
     count = 0
     for game in reversed(new_games):  # Post in reverse order
         game_info = (
-            f"```\n"
+            f"
+\n"
             f"Time: {game['Time']}\n"
             f"Game Mode: {game['Game Mode']}\n"
             f"Map: {game['Map']}\n"
@@ -160,7 +132,8 @@ def send_clan_results():
             f"Team T: {game['Team T']}\n"
             f"Percentage L: {game['Percentage L']}\n"
             f"Res:\n" + "\n".join(game['Res']) + "\n"
-            f"```\n"
+            f"
+\n"
         )
         content += game_info
         count += 1
@@ -168,25 +141,21 @@ def send_clan_results():
         if count == 6:
             messages = split_message(content)
             for message in messages:
-                send_discord_message(message, WEBHOOK_URLS)
+                send_discord_message(message)
             content = ""
             count = 0
 
     if content:
         messages = split_message(content)
         for message in messages:
-            send_discord_message(message, WEBHOOK_URLS)
+            send_discord_message(message)
 
     save_data(existing_data + new_games)
-
-# Send the top winner once every hour
-def schedule_top_winner():
-    while True:
-        send_top_winner()
-        sleep(3600)  # Wait for 1 hour
 
 if __name__ == '__main__':
     try:
         send_clan_results()
     except Exception as e:
         logging.error(f"An error occurred: {e}")
+        send_discord_message(f"An error occurred while running the scraper: {e}")
+
