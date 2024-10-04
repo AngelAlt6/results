@@ -36,11 +36,28 @@ def calculate_wins(data):
         game_time = datetime.strptime(game['Time'], '%a, %d %b %Y %H:%M:%S %Z')
         if game_time > cutoff_time:
             for result in game['Res']:
+                # Log the result being processed for debugging
+                logging.debug(f"Processing result: {result}")
+
+                # Ensure the result is in the expected format
+                parts = result.split('=')
+                if len(parts) < 2:
+                    logging.warning(f"Unexpected format in result: {result}")
+                    continue
+
                 clan_name = result.split(':')[0].strip('[] ')
+                percentage_str = parts[1].split(',')[0].strip()
+
+                try:
+                    percentage = float(percentage_str)
+                except ValueError:
+                    logging.warning(f"Could not convert percentage to float: {percentage_str}")
+                    continue
+
                 if clan_name not in win_counts:
                     win_counts[clan_name] = 0
+
                 # Check for win (assuming that a win is determined by the highest percentage)
-                percentage = float(result.split('=')[1].split(',')[0].strip())
                 if percentage > 50:  # Modify this condition based on your winning criteria
                     win_counts[clan_name] += 1
 
