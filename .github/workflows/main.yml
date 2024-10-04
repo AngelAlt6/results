@@ -4,6 +4,10 @@ on:
   schedule:
     - cron: '*/5 * * * *'  # Run every 5 minutes
   workflow_dispatch:  # Allows manual triggering
+concurrency:
+  group: Scrape Territorial.io Results  # A unique group name to limit concurrency
+  cancel-in-progress: true  # Cancels any currently running workflow before starting a new one
+
 
 jobs:
   scrape_and_post:
