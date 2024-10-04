@@ -20,12 +20,17 @@ if not WEBHOOK_URL:
 def load_data():
     if os.path.exists(DATA_FILE):
         try:
-            with open(DATA_FILE, 'r') as file:
+            with open(DATA_FILE, 'r', encoding='utf-8') as file:
                 return json.load(file)
         except json.JSONDecodeError:
             logging.error("JSONDecodeError: The data file is empty or corrupted.")
             return []
     return []
+
+# Sanitize result strings by removing unexpected characters
+def sanitize_result(result):
+    # Replace unwanted characters (you can customize this based on what you find in your results)
+    return ''.join(char for char in result if char.isprintable())
 
 # Calculate wins in the last 24 hours
 def calculate_wins(data):
@@ -36,8 +41,9 @@ def calculate_wins(data):
         game_time = datetime.strptime(game['Time'], '%a, %d %b %Y %H:%M:%S %Z')
         if game_time > cutoff_time:
             for result in game['Res']:
-                # Log the result being processed for debugging
-                logging.debug(f"Processing result: {result}")
+                # Sanitize the result
+                result = sanitize_result(result)
+                logging.debug(f"Processing sanitized result: {result}")
 
                 # Ensure the result is in the expected format
                 parts = result.split('=')
