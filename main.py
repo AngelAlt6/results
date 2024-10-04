@@ -4,18 +4,28 @@ import logging
 import json
 from datetime import datetime, timedelta
 from time import sleep
+from threading import Lock
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 
-# Discord Webhook URL from environment variable
-WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
-DATA_FILE = 'clan_results.json'
+# Webhook URLs for general game results
+WEBHOOK_URLS = os.getenv('DISCORD_WEBHOOK_URLS', '').split(',')
 
-# Check if the webhook URL is set
-if not WEBHOOK_URL:
-    logging.error("DISCORD_WEBHOOK_URL environment variable is not set.")
+# Webhook URLs for top winner messages
+WINNER_WEBHOOK_URLS = os.getenv('DISCORD_WINNER_WEBHOOK_URLS', '').split(',')
+
+if not WEBHOOK_URLS or WEBHOOK_URLS == ['']:
+    logging.error("DISCORD_WEBHOOK_URLS environment variable is not set.")
     exit(1)
+
+if not WINNER_WEBHOOK_URLS or WINNER_WEBHOOK_URLS == ['']:
+    logging.warning("DISCORD_WINNER_WEBHOOK_URLS is not set. No winner messages will be sent.")
+
+DATA_FILE = 'clan_results.json'
+LOCK_FILE = 'lockfile.lock'
+win_counter = {}
+lock = Lock()
 
 # Load existing data
 def load_data():
@@ -84,14 +94,15 @@ def scrape_clan_results():
 
     return games
 
-# Function to send the message to Discord
-def send_discord_message(content):
+# Function to send the message to multiple Discord webhooks
+def send_discord_message(content, webhooks):
     data = {"content": content}
-    try:
-        response = requests.post(WEBHOOK_URL, json=data)
-        response.raise_for_status()
-    except requests.exceptions.RequestException as e:
-        logging.error(f"Failed to send message: {e}")
+    for webhook_url in webhooks:
+        try:
+            response = requests.post(webhook_url, json=data)
+            response.raise_for_status()
+        except requests.exceptions.RequestException as e:
+            logging.error(f"Failed to send message to {webhook_url}: {e}")
 
 # Split the message into smaller parts if it exceeds Discord's limit
 def split_message(content, limit=2000):
@@ -104,6 +115,22 @@ def split_message(content, limit=2000):
         content = content[split_index:]
     parts.append(content)
     return parts
+
+# Update win counter for players
+def update_win_counter(games):
+    global win_counter
+    for game in games:
+        for result in game['Res']:
+            player_name = result.split()[1]  # Adjust according to format
+            win_counter[player_name] = win_counter.get(player_name, 0) + 1
+
+# Send the player with most wins in the past 24 hours to Discord
+def send_top_winner():
+    if not win_counter:
+        return
+    top_winner = max(win_counter, key=win_counter.get)
+    content = f"Player with most wins in the past 24 hours: {top_winner} with {win_counter[top_winner]} wins!"
+    send_discord_message(content, WINNER_WEBHOOK_URLS)
 
 # Format and send the scraped data to Discord
 def send_clan_results():
@@ -139,20 +166,52 @@ def send_clan_results():
         if count == 6:
             messages = split_message(content)
             for message in messages:
-                send_discord_message(message)
+                send_discord_message(message, WEBHOOK_URLS)
             content = ""
             count = 0
 
     if content:
         messages = split_message(content)
         for message in messages:
-            send_discord_message(message)
+            send_discord_message(message, WEBHOOK_URLS)
 
+    update_win_counter(new_games)
     save_data(existing_data + new_games)
 
+# Locking mechanism to ensure only one workflow is running
+def is_another_workflow_running():
+    return os.path.exists(LOCK_FILE)
+
+def create_lock():
+    with open(LOCK_FILE, 'w') as file:
+        file.write('lock')
+
+def remove_lock():
+    if os.path.exists(LOCK_FILE):
+        os.remove(LOCK_FILE)
+
+# Main loop function
+def main_loop():
+    while True:
+        if not is_another_workflow_running():
+            lock.acquire()
+            create_lock()
+            try:
+                send_clan_results()
+            except Exception as e:
+                logging.error(f"An error occurred: {e}")
+                send_discord_message(f"An error occurred while running the scraper: {e}", WEBHOOK_URLS)
+            finally:
+                remove_lock()
+                lock.release()
+        else:
+            logging.info("Another workflow is running. Skipping this cycle.")
+        
+        # Send top winner every hour
+        if datetime.now().minute == 0:
+            send_top_winner()
+        
+        sleep(300)  # Wait for 5 minutes before next cycle
+
 if __name__ == '__main__':
-    try:
-        send_clan_results()
-    except Exception as e:
-        logging.error(f"An error occurred: {e}")
-        send_discord_message(f"An error occurred while running the scraper: {e}")
+    main_loop()
