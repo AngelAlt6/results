@@ -123,17 +123,15 @@ def send_clan_results():
     count = 0
     for game in reversed(new_games):  # Post in reverse order
         game_info = (
-            f"
-\n"
-            f"Time: {game['Time']}\n"
-            f"Game Mode: {game['Game Mode']}\n"
-            f"Map: {game['Map']}\n"
-            f"Player Count: {game['Player Count']}\n"
-            f"Team T: {game['Team T']}\n"
-            f"Percentage L: {game['Percentage L']}\n"
-            f"Res:\n" + "\n".join(game['Res']) + "\n"
-            f"
-\n"
+                f"```"
+                f"\nTime: {game['Time']}\n"
+                f"Game Mode: {game['Game Mode']}\n"
+                f"Map: {game['Map']}\n"
+                f"Player Count: {game['Player Count']}\n"
+                f"Team T: {game['Team T']}\n"
+                f"Percentage L: {game['Percentage L']}\n"
+                f"Res:\n" + "\n".join(game['Res']) + "\n"
+                f"```\n"
         )
         content += game_info
         count += 1
