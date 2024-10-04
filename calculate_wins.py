@@ -63,7 +63,7 @@ def calculate_wins(data):
 
 # Send results to Discord
 def send_discord_message(content):
-    data = {"content" content}
+    data = {"content": content}
     try:
         response = requests.post(WEBHOOK_URL, json=data)
         response.raise_for_status()
