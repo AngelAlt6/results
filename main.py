@@ -4,16 +4,15 @@ import logging
 import json
 from datetime import datetime, timedelta
 from time import sleep
-from threading import Lock
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 
 # Webhook URLs for general game results
-WEBHOOK_URLS = os.getenv('DISCORD_WEBHOOK_URL', '').split(',')
+WEBHOOK_URLS = os.getenv('DISCORD_WEBHOOK_URLS', '').split(',')
 
 # Webhook URLs for top winner messages
-WINNER_WEBHOOK_URLS = os.getenv('DISCORD_WINNER_WEBHOOK_URL', '').split(',')
+WINNER_WEBHOOK_URLS = os.getenv('DISCORD_WINNER_WEBHOOK_URLS', '').split(',')
 
 if not WEBHOOK_URLS or WEBHOOK_URLS == ['']:
     logging.error("DISCORD_WEBHOOK_URLS environment variable is not set.")
@@ -23,9 +22,7 @@ if not WINNER_WEBHOOK_URLS or WINNER_WEBHOOK_URLS == ['']:
     logging.warning("DISCORD_WINNER_WEBHOOK_URLS is not set. No winner messages will be sent.")
 
 DATA_FILE = 'clan_results.json'
-LOCK_FILE = 'lockfile.lock'
 win_counter = {}
-lock = Lock()
 
 # Load existing data
 def load_data():
@@ -94,13 +91,15 @@ def scrape_clan_results():
 
     return games
 
-# Function to send the message to multiple Discord webhooks
+# Function to send the message to multiple Discord webhooks with a delay
 def send_discord_message(content, webhooks):
     data = {"content": content}
+    
     for webhook_url in webhooks:
         try:
             response = requests.post(webhook_url, json=data)
             response.raise_for_status()
+            sleep(5)  # Adding 5 seconds delay between each message to avoid rate-limiting
         except requests.exceptions.RequestException as e:
             logging.error(f"Failed to send message to {webhook_url}: {e}")
 
@@ -121,7 +120,8 @@ def update_win_counter(games):
     global win_counter
     for game in games:
         for result in game['Res']:
-            player_name = result.split()[1]  # Adjust according to format
+            # Assuming the format of result is something like '[Rank] PlayerName (Points)'
+            player_name = result.split()[1]  # Adjust based on actual format of result
             win_counter[player_name] = win_counter.get(player_name, 0) + 1
 
 # Send the player with most wins in the past 24 hours to Discord
@@ -145,6 +145,8 @@ def send_clan_results():
     if not new_games:
         logging.info("No new game results to send.")
         return
+
+    update_win_counter(new_games)  # Update win counter based on new games
 
     content = ""
     count = 0
@@ -175,43 +177,16 @@ def send_clan_results():
         for message in messages:
             send_discord_message(message, WEBHOOK_URLS)
 
-    update_win_counter(new_games)
     save_data(existing_data + new_games)
 
-# Locking mechanism to ensure only one workflow is running
-def is_another_workflow_running():
-    return os.path.exists(LOCK_FILE)
-
-def create_lock():
-    with open(LOCK_FILE, 'w') as file:
-        file.write('lock')
-
-def remove_lock():
-    if os.path.exists(LOCK_FILE):
-        os.remove(LOCK_FILE)
-
-# Main loop function
-def main_loop():
+# Send the top winner once every hour
+def schedule_top_winner():
     while True:
-        if not is_another_workflow_running():
-            lock.acquire()
-            create_lock()
-            try:
-                send_clan_results()
-            except Exception as e:
-                logging.error(f"An error occurred: {e}")
-                send_discord_message(f"An error occurred while running the scraper: {e}", WEBHOOK_URLS)
-            finally:
-                remove_lock()
-                lock.release()
-        else:
-            logging.info("Another workflow is running. Skipping this cycle.")
-        
-        # Send top winner every hour
-        if datetime.now().minute == 0:
-            send_top_winner()
-        
-        sleep(300)  # Wait for 5 minutes before next cycle
+        send_top_winner()
+        sleep(3600)  # Wait for 1 hour
 
 if __name__ == '__main__':
-    main_loop()
+    try:
+        send_clan_results()
+    except Exception as e:
+        logging.error(f"An error occurred: {e}")
