@@ -1,67 +1,90 @@
-import os
-import json
-import logging
-from datetime import datetime, timedelta
 import requests
+import os
+import logging
+import json
+from datetime import datetime, timedelta
+from time import sleep
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 
 # Discord Webhook URL from environment variable
-WEBHOOK_URL = os.getenv('DISCORD_WINNER_WEBHOOK_URL')
+WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
 DATA_FILE = 'clan_results.json'
 
 # Check if the webhook URL is set
 if not WEBHOOK_URL:
-    logging.error("DISCORD_WINNER_WEBHOOK_URL environment variable is not set.")
+    logging.error("DISCORD_WEBHOOK_URL environment variable is not set.")
     exit(1)
 
 # Load existing data
 def load_data():
     if os.path.exists(DATA_FILE):
         try:
-            with open(DATA_FILE, 'r', encoding='utf-8') as file:
+            with open(DATA_FILE, 'r') as file:
                 return json.load(file)
         except json.JSONDecodeError:
-            logging.error("JSONDecodeError: The data file is empty or corrupted.")
+            logging.error("JSONDecodeError: The data file is empty or corrupted. Initializing with an empty list.")
             return []
     return []
 
-# Sanitize result strings by removing unexpected characters
-def sanitize_result(result):
-    return ''.join(c for c in result if c.isprintable())
+# Save data to JSON file
+def save_data(data):
+    with open(DATA_FILE, 'w') as file:
+        json.dump(data, file, indent=4)
 
-# Calculate wins in the last 24 hours
-def calculate_wins(data):
+# Remove data older than 24 hours
+def remove_old_data(data):
     cutoff_time = datetime.now() - timedelta(hours=24)
-    win_counts = {}
+    return [game for game in data if datetime.strptime(game['Time'], '%a, %d %b %Y %H:%M:%S %Z') > cutoff_time]
 
-    for game in data:
-        game_time = datetime.strptime(game['Time'], '%a, %d %b %Y %H:%M:%S %Z')
-        if game_time > cutoff_time:
-            # Check if there are results
-            if not game['Res']:
-                continue
+# Scrape the results from the website
+def scrape_clan_results():
+    url = 'https://territorial.io/clan-results'
+    retries = 3
+    for _ in range(retries):
+        try:
+            response = requests.get(url)
+            response.raise_for_status()
+            break
+        except requests.exceptions.RequestException as e:
+            logging.error(f"Failed to retrieve data: {e}")
+            sleep(5)
+    else:
+        logging.error("Max retries exceeded. Exiting.")
+        return None
 
-            # Iterate over each result in the Res section
-            for result in game['Res']:
-                # Sanitize the result
-                result = sanitize_result(result)
-                logging.debug(f"Processing sanitized result: {result}")
+    text = response.text
+    games = []
+    game_data = {}
 
-                # Extract clan names from the result
-                # Assuming each result line format includes the team name
-                clan_name = result.split(' ')[0]  # Assuming the clan name is the first word
+    for line in text.splitlines():
+        if line.startswith("Time:"):
+            if game_data:
+                games.append(game_data)
+                game_data = {}
+            game_data['Time'] = line.split("Time:")[1].strip()
+        elif line.startswith("Game Mode:"):
+            game_data['Game Mode'] = line.split("Game Mode:")[1].strip()
+        elif line.startswith("Map:"):
+            game_data['Map'] = line.split("Map:")[1].strip()
+        elif line.startswith("Player Count:"):
+            game_data['Player Count'] = line.split("Player Count:")[1].strip()
+        elif line.startswith("Team T:"):
+            game_data['Team T'] = line.split("Team T:")[1].strip()
+        elif line.startswith("Percentage L:"):
+            game_data['Percentage L'] = line.split("Percentage L:")[1].strip()
+        elif line.startswith("Res:"):
+            game_data['Res'] = []
+        elif line.startswith("   ["):
+            game_data['Res'].append(line.strip())
 
-                if clan_name not in win_counts:
-                    win_counts[clan_name] = 0
+    if game_data:
+        games.append(game_data)
 
-                # Count each entry as a win
-                win_counts[clan_name] += 1
+    return games
 
-    return win_counts
-
-# Send results to Discord
+# Function to send the message to Discord
 def send_discord_message(content):
     data = {"content": content}
     try:
@@ -70,24 +93,66 @@ def send_discord_message(content):
     except requests.exceptions.RequestException as e:
         logging.error(f"Failed to send message: {e}")
 
-# Format and send the top clans' win results
-def report_wins():
-    data = load_data()
-    win_counts = calculate_wins(data)
+# Split the message into smaller parts if it exceeds Discord's limit
+def split_message(content, limit=2000):
+    parts = []
+    while len(content) > limit:
+        split_index = content.rfind('\n', 0, limit)
+        if split_index == -1:
+            split_index = limit
+        parts.append(content[:split_index])
+        content = content[split_index:]
+    parts.append(content)
+    return parts
 
-    if not win_counts:
-        logging.info("No wins found in the last 24 hours.")
+# Format and send the scraped data to Discord
+def send_clan_results():
+    existing_data = load_data()
+    existing_data = remove_old_data(existing_data)
+    games = scrape_clan_results()
+    if not games:
+        logging.info("No game results to send.")
         return
 
-    # Sort clans by win counts and limit to top 30
-    sorted_wins = sorted(win_counts.items(), key=lambda item: item[1], reverse=True)[:30]
+    new_games = [game for game in games if game not in existing_data]
+    if not new_games:
+        logging.info("No new game results to send.")
+        return
 
-    # Create message content with numbering
-    content = "Top 30 Clans with Most Wins in the Last 24 Hours:\n"
-    for idx, (clan, wins) in enumerate(sorted_wins, start=1):  # Adding index starting from 1
-        content += f"{idx}. {clan}: {wins} wins\n"
+    content = ""
+    count = 0
+    for game in reversed(new_games):  # Post in reverse order
+        game_info = (
+            f"```"
+            f"\nTime: {game['Time']}\n"
+            f"Game Mode: {game['Game Mode']}\n"
+            f"Map: {game['Map']}\n"
+            f"Player Count: {game['Player Count']}\n"
+            f"Team T: {game['Team T']}\n"
+            f"Percentage L: {game['Percentage L']}\n"
+            f"Res:\n" + "\n".join(game['Res']) + "\n"
+            f"```\n"
+        )
+        content += game_info
+        count += 1
 
-    send_discord_message(content)
+        if count == 6:
+            messages = split_message(content)
+            for message in messages:
+                send_discord_message(message)
+            content = ""
+            count = 0
+
+    if content:
+        messages = split_message(content)
+        for message in messages:
+            send_discord_message(message)
+
+    save_data(existing_data + new_games)
 
 if __name__ == '__main__':
-    report_wins()
+    try:
+        send_clan_results()
+    except Exception as e:
+        logging.error(f"An error occurred: {e}")
+        send_discord_message(f"An error occurred while running the scraper: {e}")
