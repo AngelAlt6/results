@@ -10,10 +10,10 @@ from threading import Lock
 logging.basicConfig(level=logging.INFO)
 
 # Webhook URLs for general game results
-WEBHOOK_URLS = os.getenv('DISCORD_WEBHOOK_URLS', '').split(',')
+WEBHOOK_URLS = os.getenv('DISCORD_WEBHOOK_URL', '').split(',')
 
 # Webhook URLs for top winner messages
-WINNER_WEBHOOK_URLS = os.getenv('DISCORD_WINNER_WEBHOOK_URLS', '').split(',')
+WINNER_WEBHOOK_URLS = os.getenv('DISCORD_WINNER_WEBHOOK_URL', '').split(',')
 
 if not WEBHOOK_URLS or WEBHOOK_URLS == ['']:
     logging.error("DISCORD_WEBHOOK_URLS environment variable is not set.")
