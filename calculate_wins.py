@@ -29,7 +29,7 @@ def load_data():
 
 # Sanitize result strings by removing unexpected characters
 def sanitize_result(result):
-    return ''.join(c for c in result if c.isprintable() and c not in ('\n', '\r'))
+    return ''.join(c for c in result if c.isprintable())
 
 # Calculate wins in the last 24 hours
 def calculate_wins(data):
@@ -39,32 +39,25 @@ def calculate_wins(data):
     for game in data:
         game_time = datetime.strptime(game['Time'], '%a, %d %b %Y %H:%M:%S %Z')
         if game_time > cutoff_time:
+            # Check if there are results
+            if not game['Res']:
+                continue
+
+            # Iterate over each result in the Res section
             for result in game['Res']:
                 # Sanitize the result
                 result = sanitize_result(result)
                 logging.debug(f"Processing sanitized result: {result}")
 
-                # Ensure the result is in the expected format
-                parts = result.split('=')
-                if len(parts) < 2:
-                    logging.warning(f"Unexpected format in result: {result}")
-                    continue
-                
-                try:
-                    clan_name = result.split(':')[0].strip('[] ')
-                    percentage_str = parts[1].split(',')[0].strip()
-                    percentage = float(percentage_str)
+                # Extract clan names from the result
+                # Assuming each result line format includes the team name
+                clan_name = result.split(' ')[0]  # Assuming the clan name is the first word
 
-                    if clan_name not in win_counts:
-                        win_counts[clan_name] = 0
+                if clan_name not in win_counts:
+                    win_counts[clan_name] = 0
 
-                    # Check for win
-                    if percentage > 50:  # Modify based on your winning criteria
-                        win_counts[clan_name] += 1
-                
-                except ValueError as e:
-                    logging.warning(f"Could not process result: {result}, error: {e}")
-                    continue
+                # Count each entry as a win
+                win_counts[clan_name] += 1
 
     return win_counts
 
@@ -89,10 +82,10 @@ def report_wins():
     # Sort clans by win counts and limit to top 30
     sorted_wins = sorted(win_counts.items(), key=lambda item: item[1], reverse=True)[:30]
 
-    # Create message content
+    # Create message content with numbering
     content = "Top 30 Clans with Most Wins in the Last 24 Hours:\n"
-    for clan, wins in sorted_wins:
-        content += f"{clan}: {wins} wins\n"
+    for idx, (clan, wins) in enumerate(sorted_wins, start=1):  # Adding index starting from 1
+        content += f"{idx}. {clan}: {wins} wins\n"
 
     send_discord_message(content)
 
