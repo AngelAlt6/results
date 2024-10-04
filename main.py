@@ -123,8 +123,7 @@ def send_clan_results():
     count = 0
     for game in reversed(new_games):  # Post in reverse order
         game_info = (
-            f"
-\n"
+            f"\n"
             f"Time: {game['Time']}\n"
             f"Game Mode: {game['Game Mode']}\n"
             f"Map: {game['Map']}\n"
@@ -132,8 +131,7 @@ def send_clan_results():
             f"Team T: {game['Team T']}\n"
             f"Percentage L: {game['Percentage L']}\n"
             f"Res:\n" + "\n".join(game['Res']) + "\n"
-            f"
-\n"
+            f"\n"
         )
         content += game_info
         count += 1
@@ -153,9 +151,11 @@ def send_clan_results():
     save_data(existing_data + new_games)
 
 if __name__ == '__main__':
-    try:
-        send_clan_results()
-    except Exception as e:
-        logging.error(f"An error occurred: {e}")
-        send_discord_message(f"An error occurred while running the scraper: {e}")
-
+    while True:
+        try:
+            send_clan_results()
+        except Exception as e:
+            logging.error(f"An error occurred: {e}")
+            send_discord_message(f"An error occurred while running the scraper: {e}")
+        # Set a sleep interval to control how often the script runs, e.g., 15 minutes
+        sleep(1)  # Sleep for 900 seconds (15 minutes)
