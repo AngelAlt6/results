@@ -110,44 +110,49 @@ def send_clan_results():
     existing_data = load_data()
     existing_data = remove_old_data(existing_data)
     games = scrape_clan_results()
+    
     if not games:
         logging.info("No game results to send.")
         return
 
-    new_games = [game for game in games if game not in existing_data]
-    if not new_games:
-        logging.info("No new game results to send.")
-        return
+    # Create a set of existing entries for comparison
+    existing_games_set = set((game['Time'], game['Game Mode']) for game in existing_data)
+    new_games = []
 
     content = ""
     count = 0
-    for game in reversed(new_games):  # Post in reverse order
-        game_info = (
-            f"```"
-            f"\nTime: {game['Time']}\n"
-            f"Game Mode: {game['Game Mode']}\n"
-            f"Map: {game['Map']}\n"
-            f"Player Count: {game['Player Count']}\n"
-            f"Team T: {game['Team T']}\n"
-            f"Percentage L: {game['Percentage L']}\n"
-            f"Res:\n" + "\n".join(game['Res']) + "\n"
-            f"```\n"
-        )
-        content += game_info
-        count += 1
+    for game in reversed(games):  # Post in reverse order
+        # Use a tuple of (Time, Game Mode) to compare for uniqueness
+        game_identifier = (game['Time'], game['Game Mode'])
+        if game_identifier not in existing_games_set:
+            new_games.append(game)  # Only keep new games
+            game_info = (
+                f"```"
+                f"\nTime: {game['Time']}\n"
+                f"Game Mode: {game['Game Mode']}\n"
+                f"Map: {game['Map']}\n"
+                f"Player Count: {game['Player Count']}\n"
+                f"Team T: {game['Team T']}\n"
+                f"Percentage L: {game['Percentage L']}\n"
+                f"Res:\n" + "\n".join(game['Res']) + "\n"
+                f"```\n"
+            )
+            content += game_info
+            count += 1
 
-        if count == 6:
-            messages = split_message(content)
-            for message in messages:
-                send_discord_message(message)
-            content = ""
-            count = 0
+            if count == 6:
+                messages = split_message(content)
+                for message in messages:
+                    send_discord_message(message)
+                content = ""
+                count = 0
 
     if content:
         messages = split_message(content)
         for message in messages:
             send_discord_message(message)
 
+    # Update the JSON file with the new entries
     save_data(existing_data + new_games)
 
 if __name__ == '__main__':
@@ -157,5 +162,5 @@ if __name__ == '__main__':
         except Exception as e:
             logging.error(f"An error occurred: {e}")
             send_discord_message(f"An error occurred while running the scraper: {e}")
-        # Set a sleep interval to control how often the script runs, e.g., 15 minutes
-        sleep(5)  # Sleep for 900 seconds (15 minutes)
+        # Set a sleep interval to control how often the script runs
+        sleep(10)  # Sleep for 300 seconds (5 minutes)
