@@ -49,9 +49,9 @@ def calculate_wins(data):
                 result = sanitize_result(result)
                 logging.debug(f"Processing sanitized result: {result}")
 
-                # Extract clan names from the result
-                # Assuming each result line format includes the team name
-                clan_name = result.split(' ')[0]  # Assuming the clan name is the first word
+                # Extract clan names from the result and sanitize
+                # Assuming the clan name is the first word in the result
+                clan_name = result.split(' ')[0].strip(':').strip()  # Remove ':' and spaces
 
                 if clan_name not in win_counts:
                     win_counts[clan_name] = 0
@@ -85,8 +85,7 @@ def report_wins():
     # Create message content with numbering
     content = "Top 30 Clans with Most Wins in the Last 24 Hours:\n"
     for idx, (clan, wins) in enumerate(sorted_wins, start=1):  # Adding index starting from 1
-        content += f"({idx}). {clan} - wins: {wins}\n"
-
+        content += f"{idx}. {clan} - wins: {wins}\n"
 
     send_discord_message(content)
 
