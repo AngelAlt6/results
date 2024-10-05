@@ -83,7 +83,7 @@ def report_wins():
     sorted_wins = sorted(win_counts.items(), key=lambda item: item[1], reverse=True)[:30]
 
     # Create message content with numbering
-    content = "Top 30 Clans with Most Wins in the Last 24 Hours:\n"
+    content = "# Here are the clans with most wins in the last 24 Hours\n"
     for idx, (clan, wins) in enumerate(sorted_wins, start=1):  # Adding index starting from 1
         content += f"{idx}. {clan} - wins: {wins}\n"
 
