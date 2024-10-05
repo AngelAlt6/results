@@ -85,7 +85,8 @@ def report_wins():
     # Create message content with numbering
     content = "Top 30 Clans with Most Wins in the Last 24 Hours:\n"
     for idx, (clan, wins) in enumerate(sorted_wins, start=1):  # Adding index starting from 1
-        content += f"{idx}. {clan} - {wins} wins\n"
+        content += f"({idx}). {clan} - wins: {wins}\n"
+
 
     send_discord_message(content)
 
