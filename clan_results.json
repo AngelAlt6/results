@@ -1,262 +1,5 @@
 [
     {
-        "Time": "Wed, 16 Oct 2024 18:58:24 GMT",
-        "Game Mode": "7 Teams",
-        "Map": "Caucasia",
-        "Player Count": "44",
-        "Team T": "573779",
-        "Percentage L": "0.01202",
-        "Res": [
-            "[LT]:      0.47436 + 0.04020 =  0.51456, T =   159414 (27.8%)"
-        ]
-    },
-    {
-        "Time": "Wed, 16 Oct 2024 18:57:15 GMT",
-        "Game Mode": "8 Teams",
-        "Map": "Africa",
-        "Player Count": "45",
-        "Team T": "411502",
-        "Percentage L": "0.03333",
-        "Res": [
-            "[X]:       2.16248 + 0.10850 =  2.27097, T =   316980 (77.0%)"
-        ]
-    },
-    {
-        "Time": "Wed, 16 Oct 2024 18:57:09 GMT",
-        "Game Mode": "5 Teams",
-        "Map": "Europe",
-        "Player Count": "55",
-        "Team T": "502059",
-        "Percentage L": "0.00338",
-        "Res": [
-            "[SPQR]:    4.41786 + 0.01061 =  4.42846, T =    30934 ( 6.2%)"
-        ]
-    },
-    {
-        "Time": "Wed, 16 Oct 2024 18:57:07 GMT",
-        "Game Mode": "6 Teams",
-        "Map": "Mountains 2",
-        "Player Count": "21",
-        "Team T": "499569",
-        "Percentage L": "0.00000",
-        "Res": []
-    },
-    {
-        "Time": "Wed, 16 Oct 2024 18:57:03 GMT",
-        "Game Mode": "2 Teams",
-        "Map": "Island",
-        "Player Count": "39",
-        "Team T": "94608",
-        "Percentage L": "0.01186",
-        "Res": [
-            "[AZE]:     0.85997 + 0.03344 =  0.89341, T =    25050 (26.5%)",
-            "[TRAM]:    0.00000 + 0.00607 =  0.00607, T =     4490 ( 4.7%)"
-        ]
-    },
-    {
-        "Time": "Wed, 16 Oct 2024 18:56:28 GMT",
-        "Game Mode": "6 Teams",
-        "Map": "Scandinavia",
-        "Player Count": "37",
-        "Team T": "433545",
-        "Percentage L": "0.00453",
-        "Res": [
-            "[EU]:     16.53370 + 0.01132 = 16.54502, T =    56390 (13.0%)"
-        ]
-    },
-    {
-        "Time": "Wed, 16 Oct 2024 18:56:28 GMT",
-        "Game Mode": "6 Teams",
-        "Map": "World",
-        "Player Count": "98",
-        "Team T": "466152",
-        "Percentage L": "0.00000",
-        "Res": []
-    },
-    {
-        "Time": "Wed, 16 Oct 2024 18:56:24 GMT",
-        "Game Mode": "7 Teams",
-        "Map": "Asia",
-        "Player Count": "50",
-        "Team T": "339910",
-        "Percentage L": "0.01823",
-        "Res": [
-            "[EU]:     16.49112 + 0.04560 = 16.53672, T =   127660 (37.6%)"
-        ]
-    },
-    {
-        "Time": "Wed, 16 Oct 2024 18:56:15 GMT",
-        "Game Mode": "7 Teams",
-        "Map": "Europe",
-        "Player Count": "63",
-        "Team T": "512522",
-        "Percentage L": "0.01406",
-        "Res": [
-            "[OG]:     31.03992 + 0.02440 = 31.06432, T =   115755 (22.6%)"
-        ]
-    },
-    {
-        "Time": "Wed, 16 Oct 2024 18:55:57 GMT",
-        "Game Mode": "7 Teams",
-        "Map": "Asia",
-        "Player Count": "71",
-        "Team T": "276552",
-        "Percentage L": "0.06435",
-        "Res": [
-            "[BG]:      0.31789 + 0.21581 =  0.53370, T =   276552 (100.0%)"
-        ]
-    },
-    {
-        "Time": "Wed, 16 Oct 2024 18:55:22 GMT",
-        "Game Mode": "7 Teams",
-        "Map": "Island Kingdom",
-        "Player Count": "25",
-        "Team T": "118656",
-        "Percentage L": "0.00000",
-        "Res": []
-    },
-    {
-        "Time": "Wed, 16 Oct 2024 18:54:31 GMT",
-        "Game Mode": "4 Teams",
-        "Map": "Middle East",
-        "Player Count": "72",
-        "Team T": "448751",
-        "Percentage L": "0.01631",
-        "Res": [
-            "[OG]:     31.03667 + 0.02830 = 31.06497, T =   110072 (24.5%)"
-        ]
-    },
-    {
-        "Time": "Wed, 16 Oct 2024 18:54:20 GMT",
-        "Game Mode": "2 Teams",
-        "Map": "North America",
-        "Player Count": "68",
-        "Team T": "385258",
-        "Percentage L": "0.02760",
-        "Res": [
-            "[CLOMP]:   0.00000 + 0.08945 =  0.08945, T =   151435 (39.3%)",
-            "[UZB]:     3.32114 + 0.00335 =  3.32450, T =     5988 ( 1.6%)"
-        ]
-    },
-    {
-        "Time": "Wed, 16 Oct 2024 18:54:05 GMT",
-        "Game Mode": "6 Teams",
-        "Map": "Middle East",
-        "Player Count": "71",
-        "Team T": "477519",
-        "Percentage L": "0.01098",
-        "Res": [
-            "[RU]:     11.52552 + 0.03031 = 11.55584, T =    73022 (15.3%)"
-        ]
-    },
-    {
-        "Time": "Wed, 16 Oct 2024 18:54:04 GMT",
-        "Game Mode": "3 Teams",
-        "Map": "Snow",
-        "Player Count": "29",
-        "Team T": "660176",
-        "Percentage L": "0.00335",
-        "Res": [
-            "[OG]:     31.04387 + 0.00582 = 31.04969, T =    80664 (12.2%)"
-        ]
-    },
-    {
-        "Time": "Wed, 16 Oct 2024 18:53:55 GMT",
-        "Game Mode": "5 Teams",
-        "Map": "Middle East",
-        "Player Count": "53",
-        "Team T": "445318",
-        "Percentage L": "0.01261",
-        "Res": [
-            "[EU]:     16.48420 + 0.03155 = 16.51576, T =   113244 (25.4%)"
-        ]
-    },
-    {
-        "Time": "Wed, 16 Oct 2024 18:53:54 GMT",
-        "Game Mode": "4 Teams, Contest",
-        "Map": "World",
-        "Player Count": "238",
-        "Team T": "469083",
-        "Percentage L": "0.44254",
-        "Res": [
-            "[CORGI]:  23.78897 + 0.94073 = 24.72971, T =   448943 (95.7%)"
-        ]
-    },
-    {
-        "Time": "Wed, 16 Oct 2024 18:53:41 GMT",
-        "Game Mode": "7 Teams",
-        "Map": "Snow",
-        "Player Count": "37",
-        "Team T": "697809",
-        "Percentage L": "0.00000",
-        "Res": []
-    },
-    {
-        "Time": "Wed, 16 Oct 2024 18:53:23 GMT",
-        "Game Mode": "5 Teams",
-        "Map": "Africa",
-        "Player Count": "63",
-        "Team T": "409292",
-        "Percentage L": "0.02596",
-        "Res": [
-            "[PRU]:     0.12541 + 0.07383 =  0.19924, T =   144325 (35.3%)",
-            "[SVK]:     0.73291 + 0.01333 =  0.74624, T =    26308 ( 6.4%)"
-        ]
-    },
-    {
-        "Time": "Wed, 16 Oct 2024 18:52:40 GMT",
-        "Game Mode": "3 Teams",
-        "Map": "Asia",
-        "Player Count": "61",
-        "Team T": "339235",
-        "Percentage L": "0.00793",
-        "Res": [
-            "[KR]:      0.40471 + 0.02183 =  0.42654, T =    37424 (11.0%)",
-            "[CL]:      0.00000 + 0.00473 =  0.00473, T =     8063 ( 2.4%)"
-        ]
-    },
-    {
-        "Time": "Wed, 16 Oct 2024 18:52:33 GMT",
-        "Game Mode": "4 Teams",
-        "Map": "Island",
-        "Player Count": "41",
-        "Team T": "162018",
-        "Percentage L": "0.00000",
-        "Res": []
-    },
-    {
-        "Time": "Wed, 16 Oct 2024 18:51:44 GMT",
-        "Game Mode": "4 Teams",
-        "Map": "Asia",
-        "Player Count": "50",
-        "Team T": "339486",
-        "Percentage L": "0.01794",
-        "Res": [
-            "[CMHG]:    0.03780 + 0.05224 =  0.09004, T =   106180 (31.3%)",
-            "[1112]:    1.53612 + 0.00799 =  1.54411, T =    16636 ( 4.9%)"
-        ]
-    },
-    {
-        "Time": "Wed, 16 Oct 2024 18:51:31 GMT",
-        "Game Mode": "7 Teams",
-        "Map": "Europe",
-        "Player Count": "86",
-        "Team T": "498500",
-        "Percentage L": "0.00000",
-        "Res": []
-    },
-    {
-        "Time": "Wed, 16 Oct 2024 18:51:09 GMT",
-        "Game Mode": "7 Teams",
-        "Map": "Asia",
-        "Player Count": "38",
-        "Team T": "345132",
-        "Percentage L": "0.00909",
-        "Res": [
-            "[AZE]:     0.83559 + 0.03022 =  0.86581, T =    92892 (26.9%)"
-        ]
-    },
-    {
         "Time": "Wed, 16 Oct 2024 19:22:14 GMT",
         "Game Mode": "3 Teams",
         "Map": "Mountains 2",
@@ -40951,6 +40694,271 @@
             "[JOINME]:  0.00000 + 0.00078 =  0.00078, T =     2937 ( 1.0%)",
             "[EU]:     16.04519 + 0.00165 = 16.04684, T =     8313 ( 2.8%)",
             "[FR]:     11.11776 + 0.00172 = 11.11948, T =     7847 ( 2.7%)"
+        ]
+    },
+    {
+        "Time": "Thu, 17 Oct 2024 18:58:44 GMT",
+        "Game Mode": "2 Teams",
+        "Map": "Middle East",
+        "Player Count": "61",
+        "Team T": "456890",
+        "Percentage L": "0.00500",
+        "Res": [
+            "[1112]:    1.41208 + 0.01074 =  1.42282, T =    25666 ( 5.6%)",
+            "[PL]:     10.32438 + 0.00491 = 10.32929, T =    13667 ( 3.0%)"
+        ]
+    },
+    {
+        "Time": "Thu, 17 Oct 2024 18:58:23 GMT",
+        "Game Mode": "4 Teams",
+        "Map": "Island",
+        "Player Count": "35",
+        "Team T": "82867",
+        "Percentage L": "0.00000",
+        "Res": []
+    },
+    {
+        "Time": "Thu, 17 Oct 2024 18:58:07 GMT",
+        "Game Mode": "2 Teams",
+        "Map": "World",
+        "Player Count": "123",
+        "Team T": "467015",
+        "Percentage L": "0.02326",
+        "Res": [
+            "[\u00e2\u0098\u00a6\u00ef\u00b8\u008f]:      0.12819 + 0.00265 =  0.13084, T =     3034 ( 0.6%)",
+            "[VOID]:    9.77166 + 0.00267 =  9.77432, T =     3594 ( 0.8%)",
+            "[THANOS]:  0.04719 + 0.03326 =  0.08045, T =    38015 ( 8.1%)",
+            "[PRU]:     0.18138 + 0.01150 =  0.19288, T =    13168 ( 2.8%)",
+            "[NAZI]:    0.11745 + 0.00671 =  0.12416, T =     7683 ( 1.6%)",
+            "[CORGI]:  24.63132 + 0.01294 = 24.64426, T =    24025 ( 5.1%)"
+        ]
+    },
+    {
+        "Time": "Thu, 17 Oct 2024 18:58:02 GMT",
+        "Game Mode": "5 Teams",
+        "Map": "World",
+        "Player Count": "97",
+        "Team T": "481233",
+        "Percentage L": "0.04434",
+        "Res": [
+            "[HUN]:     1.24208 + 0.14652 =  1.38860, T =   215144 (44.7%)"
+        ]
+    },
+    {
+        "Time": "Thu, 17 Oct 2024 18:57:40 GMT",
+        "Game Mode": "4 Teams",
+        "Map": "Africa",
+        "Player Count": "66",
+        "Team T": "400413",
+        "Percentage L": "0.00000",
+        "Res": []
+    },
+    {
+        "Time": "Thu, 17 Oct 2024 18:57:21 GMT",
+        "Game Mode": "3 Teams",
+        "Map": "North America",
+        "Player Count": "63",
+        "Team T": "397523",
+        "Percentage L": "0.00529",
+        "Res": [
+            "[RRE]:     0.05870 + 0.00372 =  0.06242, T =     7435 ( 1.9%)",
+            "[BRYAN]:   0.09605 + 0.01408 =  0.11013, T =    28159 ( 7.1%)"
+        ]
+    },
+    {
+        "Time": "Thu, 17 Oct 2024 18:56:28 GMT",
+        "Game Mode": "4 Teams",
+        "Map": "Europe",
+        "Player Count": "83",
+        "Team T": "507325",
+        "Percentage L": "0.00107",
+        "Res": [
+            "[PSHG]:    0.00000 + 0.00359 =  0.00359, T =     6833 ( 1.3%)"
+        ]
+    },
+    {
+        "Time": "Thu, 17 Oct 2024 18:56:11 GMT",
+        "Game Mode": "5 Teams",
+        "Map": "North America",
+        "Player Count": "56",
+        "Team T": "394705",
+        "Percentage L": "0.05380",
+        "Res": [
+            "[EU]:     16.14995 + 0.12107 = 16.27101, T =   352466 (89.3%)",
+            "[RS]:      0.02162 + 0.01940 =  0.04102, T =    42239 (10.7%)"
+        ]
+    },
+    {
+        "Time": "Thu, 17 Oct 2024 18:55:32 GMT",
+        "Game Mode": "6 Teams",
+        "Map": "Mountains 2",
+        "Player Count": "30",
+        "Team T": "438776",
+        "Percentage L": "0.02948",
+        "Res": [
+            "[OG]:     31.16094 + 0.03423 = 31.19518, T =   294032 (67.0%)",
+            "[SWE]:     0.38855 + 0.03243 =  0.42099, T =   143825 (32.8%)"
+        ]
+    },
+    {
+        "Time": "Thu, 17 Oct 2024 18:55:30 GMT",
+        "Game Mode": "2 Teams",
+        "Map": "Swamp",
+        "Player Count": "30",
+        "Team T": "618884",
+        "Percentage L": "0.00813",
+        "Res": [
+            "[RU]:     10.96659 + 0.02269 = 10.98928, T =   170235 (27.5%)"
+        ]
+    },
+    {
+        "Time": "Thu, 17 Oct 2024 18:54:48 GMT",
+        "Game Mode": "2 Teams",
+        "Map": "Black Arena",
+        "Player Count": "30",
+        "Team T": "577853",
+        "Percentage L": "0.00332",
+        "Res": [
+            "[PM]:      0.11123 + 0.00451 =  0.11574, T =    26211 ( 4.5%)",
+            "[CORGI]:  24.66309 + 0.00409 = 24.66718, T =    38660 ( 6.7%)"
+        ]
+    },
+    {
+        "Time": "Thu, 17 Oct 2024 18:54:30 GMT",
+        "Game Mode": "7 Teams",
+        "Map": "Australia",
+        "Player Count": "21",
+        "Team T": "382857",
+        "Percentage L": "0.00000",
+        "Res": []
+    },
+    {
+        "Time": "Thu, 17 Oct 2024 18:53:43 GMT",
+        "Game Mode": "2 Teams",
+        "Map": "Scandinavia",
+        "Player Count": "59",
+        "Team T": "435183",
+        "Percentage L": "0.00882",
+        "Res": [
+            "[TR]:      8.30590 + 0.00357 =  8.30947, T =     9135 ( 2.1%)",
+            "[CORGI]:  24.64952 + 0.01575 = 24.66526, T =    56989 (13.1%)"
+        ]
+    },
+    {
+        "Time": "Thu, 17 Oct 2024 18:53:41 GMT",
+        "Game Mode": "6 Teams",
+        "Map": "Cliffs",
+        "Player Count": "29",
+        "Team T": "308638",
+        "Percentage L": "0.00345",
+        "Res": [
+            "[\u00f0\u009f\u0097\u00bf]:      0.16283 + 0.01161 =  0.17443, T =    37410 (12.1%)"
+        ]
+    },
+    {
+        "Time": "Thu, 17 Oct 2024 18:53:28 GMT",
+        "Game Mode": "5 Teams",
+        "Map": "Pond",
+        "Player Count": "30",
+        "Team T": "571952",
+        "Percentage L": "0.02849",
+        "Res": [
+            "[\u00f0\u009f\u00a4\u00a1]:      0.00000 + 0.01770 =  0.01770, T =   105427 (18.4%)",
+            "[OG]:     31.13701 + 0.04021 = 31.17722, T =   466525 (81.6%)"
+        ]
+    },
+    {
+        "Time": "Thu, 17 Oct 2024 18:52:57 GMT",
+        "Game Mode": "2 Teams",
+        "Map": "Middle East",
+        "Player Count": "85",
+        "Team T": "451529",
+        "Percentage L": "0.07360",
+        "Res": [
+            "[CORGI]:  24.53220 + 0.14336 = 24.67556, T =   378481 (83.8%)",
+            "[NL]:      8.26438 + 0.01362 =  8.27799, T =    25456 ( 5.6%)"
+        ]
+    },
+    {
+        "Time": "Thu, 17 Oct 2024 18:52:57 GMT",
+        "Game Mode": "3 Teams",
+        "Map": "Pond",
+        "Player Count": "34",
+        "Team T": "575445",
+        "Percentage L": "0.01319",
+        "Res": [
+            "[\u00f0\u009f\u00a4\u00ab]:      0.03902 + 0.04441 =  0.08343, T =   224763 (39.1%)"
+        ]
+    },
+    {
+        "Time": "Thu, 17 Oct 2024 18:52:54 GMT",
+        "Game Mode": "2 Teams",
+        "Map": "Desert",
+        "Player Count": "41",
+        "Team T": "637383",
+        "Percentage L": "0.00233",
+        "Res": [
+            "[STX]:     0.00173 + 0.00026 =  0.00199, T =     1139 ( 0.2%)",
+            "[1112]:    1.40889 + 0.00742 =  1.41630, T =    33153 ( 5.2%)"
+        ]
+    },
+    {
+        "Time": "Thu, 17 Oct 2024 18:52:13 GMT",
+        "Game Mode": "4 Teams",
+        "Map": "Australia",
+        "Player Count": "47",
+        "Team T": "366389",
+        "Percentage L": "0.00000",
+        "Res": []
+    },
+    {
+        "Time": "Thu, 17 Oct 2024 18:52:05 GMT",
+        "Game Mode": "3 Teams",
+        "Map": "Caucasia",
+        "Player Count": "70",
+        "Team T": "629272",
+        "Percentage L": "0.02422",
+        "Res": [
+            "[UA]:      4.96417 + 0.02506 =  4.98923, T =    75117 (11.9%)",
+            "[USA]:     0.88798 + 0.01633 =  0.90430, T =    45786 ( 7.3%)",
+            "[CORGI]:  24.52441 + 0.01753 = 24.54195, T =    78614 (12.5%)",
+            "[ANML]:    0.25782 + 0.00942 =  0.26725, T =    26168 ( 4.2%)"
+        ]
+    },
+    {
+        "Time": "Thu, 17 Oct 2024 18:51:53 GMT",
+        "Game Mode": "7 Teams",
+        "Map": "Halo",
+        "Player Count": "26",
+        "Team T": "405606",
+        "Percentage L": "0.00130",
+        "Res": [
+            "[PL]:     10.35423 + 0.00367 = 10.35791, T =    23813 ( 5.9%)"
+        ]
+    },
+    {
+        "Time": "Thu, 17 Oct 2024 18:51:36 GMT",
+        "Game Mode": "3 Teams",
+        "Map": "Scandinavia",
+        "Player Count": "60",
+        "Team T": "466863",
+        "Percentage L": "0.05802",
+        "Res": [
+            "[PL]:     10.21919 + 0.14105 = 10.36024, T =   400737 (85.8%)",
+            "[SPQR]:    2.77038 + 0.00014 =  2.77052, T =      351 ( 0.1%)",
+            "[OG]:     31.17671 + 0.01413 = 31.19084, T =    65775 (14.1%)"
+        ]
+    },
+    {
+        "Time": "Thu, 17 Oct 2024 18:51:33 GMT",
+        "Game Mode": "7 Teams",
+        "Map": "Pond",
+        "Player Count": "17",
+        "Team T": "588581",
+        "Percentage L": "0.00922",
+        "Res": [
+            "[PL]:     10.21126 + 0.00887 = 10.22013, T =   116476 (19.8%)",
+            "[OG]:     31.16907 + 0.01051 = 31.17958, T =   226181 (38.4%)"
         ]
     }
 ]
