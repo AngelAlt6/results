@@ -83,7 +83,7 @@ def send_discord_embed(win_counts):
         },
         {
             "name": "Clan",
-            "value": "\n".join(clans_list]),  # Add brackets to clan names
+            "value": "\n".join(clans_list),  # Add brackets to clan names
             "inline": True
         },
         {
