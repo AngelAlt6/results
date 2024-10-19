@@ -64,41 +64,20 @@ def send_discord_embed(win_counts):
     # Sort clans by win counts and limit to top 30
     sorted_wins = sorted(win_counts.items(), key=lambda item: item[1], reverse=True)[:30]
 
-    # Prepare fields for the embed
-    ranks_list = [str(idx + 1) for idx in range(len(sorted_wins))]
-    clans_list = [clan for clan, _ in sorted_wins]
-    wins_list = [str(win_count) for _, win_count in sorted_wins]
+    # Prepare the leaderboard as a formatted text block
+    formatted_clans = [f"{idx + 1}. {clan} - Wins: {win_count}" for idx, (clan, win_count) in enumerate(sorted_wins)]
 
-    # Debugging Output: Print formatted clans
-    print("Formatted Clans:")
-    for rank, clan, wins in zip(ranks_list, clans_list, wins_list):
-        print(f"{rank}. {clan} - Wins: {wins}")
+    # Combine the formatted clans into one text block
+    clan_text = "\n".join(formatted_clans)
 
-    # Create the embed fields
-    fields = [
-        {
-            "name": "Rank",
-            "value": "\n".join(ranks_list),
-            "inline": True
-        },
-        {
-            "name": "Clan",
-            "value": "\n".join(clans_list),  # Add brackets to clan names
-            "inline": True
-        },
-        {
-            "name": "Wins",
-            "value": "\n".join(wins_list),
-            "inline": True
-        }
-    ]
+    # Add the TNH link between the title and the leaderboard
+    description_text = "Check out more stats from [TNH](https://discord.gg/kHUDamR5Ut).\n\n" + clan_text
 
     # Create the embed payload
     embed = {
-        "title": "🌟 Most clan wins in Last 24H 🏅",
-        "description": "Check out more stats from [TNH](https://discord.gg/kHUDamR5Ut).",
+        "title": "🌟 Most Clan Wins in Last 24H 🏅",
+        "description": description_text,  # Add TNH link before the leaderboard
         "color": int("802929", 16),  # Gold color
-        "fields": fields,
         "footer": {
             "text": "Territorial News Headlines",
             "icon_url": "https://i.imgur.com/b7CN3eB.jpeg"  # Your desired image URL
