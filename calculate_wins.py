@@ -83,7 +83,7 @@ def send_discord_embed(win_counts):
         },
         {
             "name": "Clan",
-            "value": "\n".join([f"[{clan}]" for clan in clans_list]),  # Add brackets to clan names
+            "value": "\n".join(clans_list]),  # Add brackets to clan names
             "inline": True
         },
         {
@@ -97,10 +97,10 @@ def send_discord_embed(win_counts):
     embed = {
         "title": "🏆 Top Clans with Most Wins in the Last 24 Hours",
         "description": "Here are the clans that have achieved the most wins recently.",
-        "color": int("FFD700", 16),  # Gold color
+        "color": int("802929", 16),  # Gold color
         "fields": fields,
         "footer": {
-            "text": "Data updated every 24 hours",
+            "text": "Territorial News Headlines",
             "icon_url": "https://i.imgur.com/b7CN3eB.jpeg"  # Your desired image URL
         }
     }
