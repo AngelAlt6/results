@@ -71,7 +71,7 @@ def send_discord_embed(wins):
     embed = {
         "title": "🏆 Top Clans with Most Wins in the Last 24 Hours",
         "description": "Here are the clans that have achieved the most wins recently.",
-        "color": int("FFD700", 16),  # Gold color
+        "color": int("802929", 16),  
         "fields": fields,
         "footer": {
             "text": "Data updated every 24 hours",
