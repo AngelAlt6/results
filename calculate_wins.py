@@ -71,7 +71,7 @@ def send_discord_embed(win_counts):
     clan_text = "\n".join(formatted_clans)
 
     # Add the TNH link between the title and the leaderboard
-    description_text = "Check out more stats from [TNH](https://discord.gg/kHUDamR5Ut).\n\n" + clan_text
+    description_text = "**Check out more stats from [TNH](https://discord.gg/kHUDamR5Ut).**\n\n" + clan_text
 
     # Create the embed payload
     embed = {
