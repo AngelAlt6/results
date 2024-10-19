@@ -39,61 +39,24 @@ def calculate_wins(data):
     for game in data:
         game_time = datetime.strptime(game['Time'], '%a, %d %b %Y %H:%M:%S %Z')
         if game_time > cutoff_time:
-            # Check if there are results
             if not game['Res']:
                 continue
 
-            # Iterate over each result in the Res section
             for result in game['Res']:
-                # Sanitize the result
                 result = sanitize_result(result)
                 logging.debug(f"Processing sanitized result: {result}")
 
-                # Extract clan names from the result and sanitize
-                clan_name = result.split(' ')[0].strip(':').strip()  # Remove ':' and spaces
+                clan_name = result.split(' ')[0].strip(':').strip()
 
                 if clan_name not in win_counts:
                     win_counts[clan_name] = 0
 
-                # Count each entry as a win
                 win_counts[clan_name] += 1
 
     return win_counts
 
 # Send results to Discord as an embed
-def send_discord_embed(wins):
-    # Create fields for the embed
-    fields = [
-        {"name": f"{idx + 1}. {clan}", "value": f"Wins: {win_count}", "inline": True}
-        for idx, (clan, win_count) in enumerate(wins)
-    ]
-
-    embed = {
-        "title": "🏆 Top Clans with Most Wins in the Last 24 Hours",
-        "description": "Here are the clans that have achieved the most wins recently.",
-        "color": int("802929", 16),  
-        "fields": fields,
-        "footer": {
-            "text": "Data updated every 24 hours",
-        }
-    }
-
-    payload = {
-        "embeds": [embed]
-    }
-
-    try:
-        response = requests.post(WEBHOOK_URL, json=payload)
-        response.raise_for_status()
-        logging.info("Successfully sent embed to Discord.")
-    except requests.exceptions.RequestException as e:
-        logging.error(f"Failed to send embed: {e}")
-
-# Format and send the top clans' win results
-def report_wins():
-    data = load_data()
-    win_counts = calculate_wins(data)
-
+def send_discord_embed(win_counts):
     if not win_counts:
         logging.info("No wins found in the last 24 hours.")
         return
@@ -101,7 +64,62 @@ def report_wins():
     # Sort clans by win counts and limit to top 30
     sorted_wins = sorted(win_counts.items(), key=lambda item: item[1], reverse=True)[:30]
 
-    send_discord_embed(sorted_wins)
+    # Prepare fields for the embed
+    ranks_list = [str(idx + 1) for idx in range(len(sorted_wins))]
+    clans_list = [clan for clan, _ in sorted_wins]
+    wins_list = [str(win_count) for _, win_count in sorted_wins]
+
+    # Debugging Output: Print formatted clans
+    print("Formatted Clans:")
+    for rank, clan, wins in zip(ranks_list, clans_list, wins_list):
+        print(f"{rank}. {clan} - Wins: {wins}")
+
+    # Create the embed fields
+    fields = [
+        {
+            "name": "Rank",
+            "value": "\n".join(ranks_list),
+            "inline": True
+        },
+        {
+            "name": "Clan",
+            "value": "\n".join([f"[{clan}]" for clan in clans_list]),  # Add brackets to clan names
+            "inline": True
+        },
+        {
+            "name": "Wins",
+            "value": "\n".join(wins_list),
+            "inline": True
+        }
+    ]
+
+    # Create the embed payload
+    embed = {
+        "title": "🏆 Top Clans with Most Wins in the Last 24 Hours",
+        "description": "Here are the clans that have achieved the most wins recently.",
+        "color": int("FFD700", 16),  # Gold color
+        "fields": fields,
+        "footer": {
+            "text": "Data updated every 24 hours",
+            "icon_url": "https://i.imgur.com/b7CN3eB.jpeg"  # Your desired image URL
+        }
+    }
+
+    # Send the embed to Discord
+    payload = {
+        "embeds": [embed]
+    }
+
+    try:
+        response = requests.post(WEBHOOK_URL, json=payload)
+        response.raise_for_status()  # Raise an error for bad responses
+        logging.info("Successfully sent embed to Discord.")
+    except requests.exceptions.HTTPError as e:
+        logging.error(f"Failed to send embed: {e.response.text}")  # Show detailed error message
+    except requests.exceptions.RequestException as e:
+        logging.error(f"Request exception: {e}")
 
 if __name__ == '__main__':
-    report_wins()
+    data = load_data()
+    win_counts = calculate_wins(data)
+    send_discord_embed(win_counts)
