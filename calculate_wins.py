@@ -95,7 +95,7 @@ def send_discord_embed(win_counts):
 
     # Create the embed payload
     embed = {
-        "title": 🌟 Most clan wins in Last 24H 🏅",
+        "title": "🌟 Most clan wins in Last 24H 🏅",
         "description": "Here are the top 30 clans with most wins recently.",
         "color": int("802929", 16),  # Gold color
         "fields": fields,
