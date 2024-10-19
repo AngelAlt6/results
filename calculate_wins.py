@@ -50,7 +50,6 @@ def calculate_wins(data):
                 logging.debug(f"Processing sanitized result: {result}")
 
                 # Extract clan names from the result and sanitize
-                # Assuming the clan name is the first word in the result
                 clan_name = result.split(' ')[0].strip(':').strip()  # Remove ':' and spaces
 
                 if clan_name not in win_counts:
@@ -61,14 +60,34 @@ def calculate_wins(data):
 
     return win_counts
 
-# Send results to Discord
-def send_discord_message(content):
-    data = {"content": content}
+# Send results to Discord as an embed
+def send_discord_embed(wins):
+    # Create fields for the embed
+    fields = [
+        {"name": f"{idx + 1}. {clan}", "value": f"Wins: {win_count}", "inline": True}
+        for idx, (clan, win_count) in enumerate(wins)
+    ]
+
+    embed = {
+        "title": "🏆 Top Clans with Most Wins in the Last 24 Hours",
+        "description": "Here are the clans that have achieved the most wins recently.",
+        "color": int("FFD700", 16),  # Gold color
+        "fields": fields,
+        "footer": {
+            "text": "Data updated every 24 hours",
+        }
+    }
+
+    payload = {
+        "embeds": [embed]
+    }
+
     try:
-        response = requests.post(WEBHOOK_URL, json=data)
+        response = requests.post(WEBHOOK_URL, json=payload)
         response.raise_for_status()
+        logging.info("Successfully sent embed to Discord.")
     except requests.exceptions.RequestException as e:
-        logging.error(f"Failed to send message: {e}")
+        logging.error(f"Failed to send embed: {e}")
 
 # Format and send the top clans' win results
 def report_wins():
@@ -82,12 +101,7 @@ def report_wins():
     # Sort clans by win counts and limit to top 30
     sorted_wins = sorted(win_counts.items(), key=lambda item: item[1], reverse=True)[:30]
 
-    # Create message content with numbering
-    content = "# Here are the clans with most wins in the last 24 Hours\n"
-    for idx, (clan, wins) in enumerate(sorted_wins, start=1):  # Adding index starting from 1
-        content += f"{idx}. {clan} - wins: {wins}\n"
-
-    send_discord_message(content)
+    send_discord_embed(sorted_wins)
 
 if __name__ == '__main__':
     report_wins()
