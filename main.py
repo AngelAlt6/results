@@ -36,7 +36,23 @@ def save_data(data):
 # Remove data older than 24 hours
 def remove_old_data(data):
     cutoff_time = datetime.now() - timedelta(hours=24)
-    return [game for game in data if datetime.strptime(game['Time'], '%a, %d %b %Y %H:%M:%S %Z') > cutoff_time]
+    
+    filtered_data = []
+    for game in data:
+        try:
+            game_time = datetime.strptime(game['Time'], '%a, %d %b %Y %H:%M:%S %Z')
+            if game_time > cutoff_time:
+                filtered_data.append(game)
+        except ValueError:
+            try:
+                # Attempt to parse with the new format
+                game_time = datetime.strptime(game['Time'], '%Y-%m-%d %H:%M:%S')
+                if game_time > cutoff_time:
+                    filtered_data.append(game)
+            except ValueError:
+                logging.warning(f"Could not parse game time for entry: {game}")
+                
+    return filtered_data
 
 # Scrape the results from the website
 def scrape_clan_results():
@@ -57,27 +73,35 @@ def scrape_clan_results():
     text = response.text
     games = []
     game_data = {}
+    lines = text.splitlines()
+    i = 0
 
-    for line in text.splitlines():
+    while i < len(lines):
+        line = lines[i].strip()
         if line.startswith("Time:"):
             if game_data:
                 games.append(game_data)
-                game_data = {}
+            game_data = {}
             game_data['Time'] = line.split("Time:")[1].strip()
-        elif line.startswith("Game Mode:"):
-            game_data['Game Mode'] = line.split("Game Mode:")[1].strip()
-        elif line.startswith("Map:"):
-            game_data['Map'] = line.split("Map:")[1].strip()
-        elif line.startswith("Player Count:"):
-            game_data['Player Count'] = line.split("Player Count:")[1].strip()
-        elif line.startswith("Team T:"):
-            game_data['Team T'] = line.split("Team T:")[1].strip()
-        elif line.startswith("Percentage L:"):
-            game_data['Percentage L'] = line.split("Percentage L:")[1].strip()
-        elif line.startswith("Res:"):
-            game_data['Res'] = []
-        elif line.startswith("   ["):
-            game_data['Res'].append(line.strip())
+            i += 1
+            game_data['Contest'] = lines[i].split("Contest:")[1].strip()
+            i += 1
+            game_data['Map'] = lines[i].split("Map:")[1].strip()
+            i += 1
+            game_data['Player Count'] = lines[i].split("Player Count:")[1].strip()
+            i += 1
+            game_data['Diminisher'] = lines[i].split("Diminisher:")[1].strip()
+            i += 1
+            game_data['Winning Clan'] = lines[i].split("Winning Clan:")[1].strip()
+            i += 1
+            game_data['Prev. Points'] = lines[i].split("Prev. Points:")[1].strip()
+            i += 1
+            game_data['Gain'] = lines[i].split("Gain:")[1].strip()
+            i += 1
+            game_data['Curr. Points'] = lines[i].split("Curr. Points:")[1].strip()
+            i += 1
+        else:
+            i += 1
 
     if game_data:
         games.append(game_data)
@@ -121,16 +145,18 @@ def send_clan_results():
 
     content = ""
     count = 0
-    for game in reversed(new_games):  # Post in reverse order
+    for game in reversed(new_games):
         game_info = (
-            f"```"
-            f"\nTime: {game['Time']}\n"
-            f"Game Mode: {game['Game Mode']}\n"
+            f"```\n"
+            f"Time: {game['Time']}\n"
+            f"Contest: {game['Contest']}\n"
             f"Map: {game['Map']}\n"
             f"Player Count: {game['Player Count']}\n"
-            f"Team T: {game['Team T']}\n"
-            f"Percentage L: {game['Percentage L']}\n"
-            f"Res:\n" + "\n".join(game['Res']) + "\n"
+            f"Diminisher: {game['Diminisher']}\n"
+            f"Winning Clan: {game['Winning Clan']}\n"
+            f"Prev. Points: {game['Prev. Points']}\n"
+            f"Gain: {game['Gain']}\n"
+            f"Curr. Points: {game['Curr. Points']}\n"
             f"```\n"
         )
         content += game_info
