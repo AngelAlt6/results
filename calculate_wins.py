@@ -37,21 +37,22 @@ def calculate_wins(data):
     win_counts = {}
 
     for game in data:
-        game_time = datetime.strptime(game['Time'], '%a, %d %b %Y %H:%M:%S %Z')
-        if game_time > cutoff_time:
-            if not game['Res']:
+        try:
+            # Try parsing with the new format first
+            game_time = datetime.strptime(game['Time'], '%a, %d %b %Y %H:%M:%S %Z')
+        except ValueError:
+            try:
+                # If the new format fails, try the old format
+                game_time = datetime.strptime(game['Time'], '%Y-%m-%d %H:%M:%S')
+            except ValueError:
+                logging.error(f"Could not parse game time for entry: {game}")
                 continue
 
-            for result in game['Res']:
-                result = sanitize_result(result)
-                logging.debug(f"Processing sanitized result: {result}")
-
-                clan_name = result.split(' ')[0].strip(':').strip()
-
-                if clan_name not in win_counts:
-                    win_counts[clan_name] = 0
-
-                win_counts[clan_name] += 1
+        if game_time > cutoff_time:
+            clan_name = game['Winning Clan']
+            if clan_name not in win_counts:
+                win_counts[clan_name] = 0
+            win_counts[clan_name] += 1
 
     return win_counts
 
